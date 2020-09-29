@@ -1,0 +1,58 @@
+version: "3"
+services:
+  mongo:
+    image: mongo:3
+    networks:
+      - graylog
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.10
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=localhost
+      - network.host=0.0.0.0
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    networks:
+      - graylog
+  graylog:
+    image: graylog/graylog:3
+    environment:
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+      - GRAYLOG_HTTP_PUBLISH_URI=http://127.0.0.1:9000/
+      - GRAYLOG_HTTP_ENABLE_CORS=true
+    volumes:
+      - ./docker/volumes/graylog/data:/usr/share/graylog/data
+    networks:
+      - graylog
+    depends_on:
+      - mongo
+      - elasticsearch
+    ports:
+      - 9000:9000
+      - 1514:1514
+      - 1514:1514/udp
+      - 12201:12201
+      - 12201:12201/udp
+  nodejs:
+    image: node:lts-slim
+    container_name: nodejs
+    hostname: nodejs
+    working_dir: /home/node/app/app
+    command: bash -c "npm i && npm start "
+    volumes:
+      - ./app:/home/node/app/app
+    networks:
+      - graylog
+
+networks:
+  graylog:
+    driver: bridge
