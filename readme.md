@@ -32,3 +32,5 @@ O input é responsável por captar os dados. Para efeito de testes uso UDP.
 
 IMPORTANTE:  
 **Em desenvolvimento e melhorias**
+
+- Graylog demora alguns instantes para subir.
