@@ -1,4 +1,7 @@
 node_modules
 .idea
 .vscode
-docker/volumes/!.gitkeep
+
+docker/volumes/graylog
+!docker/volumes/graylog/data/config/graylog.conf
+!docker/volumes/graylog/data/config/log4j2.xml
